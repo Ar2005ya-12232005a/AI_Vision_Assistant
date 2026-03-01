@@ -1,0 +1,29 @@
+class DecisionEngine:
+
+    def evaluate(self, detections, distance, frame):
+
+        danger_objects = ["person", "car", "chair", "bicycle"]
+
+        for result in detections:
+            for box in result.boxes:
+
+                if box.conf[0] < 0.6:
+                    continue
+
+                cls_id = int(box.cls[0])
+                label = result.names[cls_id]
+
+                x_center = (box.xyxy[0][0] + box.xyxy[0][2]) / 2
+                frame_width = frame.shape[1]
+
+                if x_center < frame_width / 3:
+                    direction = "left"
+                elif x_center > 2 * frame_width / 3:
+                    direction = "right"
+                else:
+                    direction = "center"
+
+                if label in danger_objects and distance < 100:
+                    return f"{label} on {direction} at {distance} cm"
+
+        return None

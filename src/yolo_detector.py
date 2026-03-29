@@ -5,5 +5,5 @@ class YoloDetector:
         self.model = YOLO(model_path)
 
     def detect(self, frame):
-        results = self.model(frame)
+        results = self.model(frame, verbose=False)
         return results

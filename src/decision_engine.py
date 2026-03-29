@@ -2,7 +2,15 @@ class DecisionEngine:
 
     def evaluate(self, detections, distance, frame):
 
-        danger_objects = ["person", "car", "chair", "bicycle"]
+        danger_objects = [
+            "person", "bicycle", "car", "motorcycle", "bus", "truck",
+            "dog", "cat", "horse", "cow",
+            "chair", "couch", "bed", "dining table",
+            "traffic light", "stop sign", "fire hydrant",
+            "backpack", "suitcase", "bottle"
+        ]
+
+        alerts = []
 
         for result in detections:
             for box in result.boxes:
@@ -13,7 +21,7 @@ class DecisionEngine:
                 cls_id = int(box.cls[0])
                 label = result.names[cls_id]
 
-                x_center = (box.xyxy[0][0] + box.xyxy[0][2]) / 2
+                x_center = float((box.xyxy[0][0] + box.xyxy[0][2]) / 2)
                 frame_width = frame.shape[1]
 
                 if x_center < frame_width / 3:
@@ -23,7 +31,14 @@ class DecisionEngine:
                 else:
                     direction = "center"
 
-                if label in danger_objects and distance < 100:
-                    return f"{label} on {direction} at {distance} cm"
+                # Priority: closer objects alerted first
+                if label in danger_objects:
+                    if distance < 50:
+                        alerts.append((0, f"Warning! {label} very close on {direction} at {distance} cm"))
+                    elif distance < 100:
+                        alerts.append((1, f"{label} on {direction} at {distance} cm"))
 
-        return None
+        # Sort by priority (0 = most urgent first)
+        alerts.sort(key=lambda x: x[0])
+
+        return alerts[0][1] if alerts else None

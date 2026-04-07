@@ -1,0 +1,95 @@
+give me the port in arduino ultrasonic sensor and buzzer to connect
+
+10:52 AM
+Here's the complete wiring guide:
+
+HC-SR04 Ultrasonic Sensor
+HC-SR04 Pin	Arduino Uno Pin
+VCC	5V
+GND	GND
+TRIG	D9
+ECHO	D10
+
+
+Buzzer
+Buzzer Pin	Arduino Uno Pin
++ (longer leg)	D8
+− (shorter leg)	GND
+Visual Layout
+Arduino Uno
+___________________
+|                  |
+| 5V  →  HC-SR04 VCC
+| GND →  HC-SR04 GND
+| D9  →  HC-SR04 TRIG
+| D10 →  HC-SR04 ECHO
+|                  |
+| D8  →  Buzzer +
+| GND →  Buzzer −
+|__________________|
+Things to Check
+Use breadboard to share GND between sensor and buzzer
+HC-SR04 needs 5V not 3.3V
+Buzzer longer leg is positive — don't reverse it
+Double check TRIG and ECHO aren't swapped — common mistake
+Once wired, upload the .ino code via Arduino IDE, then run python main.py in VS Code. Done!
+
+i should run both ide and vs code together
+
+10:55 AM
+No! Do NOT run both at the same time.
+
+The Rule is Simple
+Step	What to do
+1. Upload code	Open Arduino IDE → Upload .ino → Wait for "Done uploading"
+2. Close Arduino IDE	Close it completely or just close Serial Monitor
+3. Run Python	Go to VS Code → python main.py
+Why?
+Both Arduino IDE (Serial Monitor) and Python fight over the same COM port.
+
+Arduino IDE using COM3 + Python using COM3 = ❌ Crash
+Arduino IDE closed   + Python using COM3 = ✅ Works
+You'll get this error if both are open:
+
+serial.serialutil.SerialException: could not open port COM3
+Your Workflow Every Time
+1. Wire hardware
+2. Open Arduino IDE
+3. Upload .ino code
+4. Close Arduino IDE ← important!
+5. Open VS Code terminal
+6. python main.py
+The Arduino keeps running the uploaded code on its own — it doesn't need Arduino IDE to stay open. Think of it like flashing a phone — once done, you don't need the flashing tool anymore.
+
+close means minimise
+
+10:56 AM
+No! Close means fully exit, not minimize.
+
+Minimize vs Close
+Action	Safe?	Why
+Minimizing Arduino IDE	❌ NO	Still running, still holding COM port
+Closing Serial Monitor only	✅ YES	Frees the port, IDE can stay open
+Fully closing Arduino IDE	✅ YES	Completely frees the port
+Easiest Option — Just Close Serial Monitor
+You don't have to close the entire Arduino IDE. Just:
+
+Arduino IDE → Tools → Serial Monitor → X (close it)
+Then run python main.py in VS Code. That's enough.
+
+How to Tell if Port is Free
+Run this in VS Code terminal:
+
+powershell
+python -c "import serial; s=serial.Serial('COM3'); print('Port is free'); s.close()"
+Prints "Port is free" → good to go
+Throws error → something still holding the port
+So remember:
+
+Serial Monitor closed = ✅ run Python
+Serial Monitor open = ❌ don't run Python
+
+
+
+
+
